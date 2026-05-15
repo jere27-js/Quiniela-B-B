@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Admin — Quiniela B&B 2026</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <meta name="theme-color" content="#003087" />
+</head>
+<body>
+<script src="/js/api.js"></script>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="header-brand">
+      <div class="header-logo">B&B</div>
+      <div class="header-title">
+        Admin — Quiniela B&amp;B
+        <span>Copa del Mundo 2026</span>
+      </div>
+    </a>
+    <nav class="header-nav">
+      <a href="/" class="btn-nav">← Sitio</a>
+      <a href="/leaderboard.html" class="btn-nav">🏆 Tabla</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <!-- LOGIN -->
+  <div id="adminLogin" style="max-width:380px;margin:3rem auto;">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">🔐</span>
+        <h2>Acceso Administrador</h2>
+      </div>
+      <div class="card-body">
+        <div id="loginAlert"></div>
+        <form onsubmit="adminLogin(event)">
+          <div class="form-group">
+            <label class="form-label">Contraseña de administrador</label>
+            <input type="password" class="form-control" id="adminPass" placeholder="Contraseña" required autocomplete="current-password"/>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Entrar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL -->
+  <div id="adminPanel" style="display:none;">
+    <div class="page-header">
+      <h1>⚙️ Panel de Administración</h1>
+      <p>Ingresa los resultados reales de los partidos. Los puntos se calculan automáticamente.</p>
+    </div>
+
+    <div class="tabs" id="groupTabs" style="margin-bottom:1.25rem;"></div>
+    <div id="matchContent"></div>
+  </div>
+</main>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+let allMatches = [];
+let currentGroup = 'A';
+
+// ==================== LOGIN ====================
+async function adminLogin(e) {
+  e.preventDefault();
+  const btn  = document.getElementById('loginBtn');
+  const pass = document.getElementById('adminPass').value;
+  btn.disabled = true; btn.textContent = 'Verificando…';
+
+  try {
+    const r = await apiFetch('/api/admin/login', {
+      method: 'POST',
+      body: JSON.stringify({ password: pass }),
+    });
+    const d = await r.json();
+    if (!r.ok) {
+      document.getElementById('loginAlert').innerHTML = `<div class="alert alert-error">${d.error}</div>`;
+      return;
+    }
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    loadMatches();
+  } catch (err) {
+    document.getElementById('loginAlert').innerHTML = `<div class="alert alert-error">Error de conexión.</div>`;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Entrar';
+  }
+}
+
+// ==================== LOAD MATCHES ====================
+async function loadMatches() {
+  try {
+    const r = await fetch('/api/admin/matches');
+    const d = await r.json();
+    allMatches = d.matches;
+    renderTabs();
+    renderMatches(currentGroup);
+  } catch (err) {
+    showToast('Error al cargar partidos', 'error');
+  }
+}
+
+// ==================== RENDER ====================
+function renderTabs() {
+  const groups = [...new Set(allMatches.map(m => m.group_name))].sort();
+  const tabs = document.getElementById('groupTabs');
+  tabs.innerHTML = groups.map(g => `
+    <button class="tab-btn${g === currentGroup ? ' active' : ''}" onclick="switchGroup('${g}')">Grupo ${g}</button>
+  `).join('');
+}
+
+function switchGroup(g) {
+  currentGroup = g;
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim() === 'Grupo ' + g);
+  });
+  renderMatches(g);
+}
+
+function renderMatches(g) {
+  const matches = allMatches.filter(m => m.group_name === g);
+  const mc = document.getElementById('matchContent');
+
+  const rows = matches.map(m => {
+    const dateStr = new Date(m.match_date).toLocaleDateString('es-CO', {
+      weekday: 'short', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit', timeZone: 'America/Bogota'
+    });
+    const hasResult = m.home_score !== null && m.home_score !== undefined;
+
+    return `
+      <tr id="row_${m.id}">
+        <td style="font-size:0.75rem;color:var(--text-light);">${dateStr}</td>
+        <td>
+          <div style="font-size:0.85rem;font-weight:600;">${m.home_team} <span style="color:var(--gray-mid);">vs</span> ${m.away_team}</div>
+        </td>
+        <td>
+          <div class="result-form">
+            <input type="number" class="result-score" id="hs_${m.id}" min="0" max="20" value="${hasResult ? m.home_score : ''}" placeholder="-" />
+            <span style="font-weight:700;color:var(--gray-mid);">-</span>
+            <input type="number" class="result-score" id="as_${m.id}" min="0" max="20" value="${hasResult ? m.away_score : ''}" placeholder="-" />
+            <button class="btn btn-primary btn-sm" onclick="saveResult(${m.id})">💾</button>
+            ${hasResult ? `<button class="btn btn-sm" style="background:var(--gray);color:var(--text-light);border-color:var(--gray);" onclick="clearResult(${m.id})">✕</button>` : ''}
+          </div>
+        </td>
+        <td>
+          ${hasResult
+            ? `<span class="match-result-badge result-exact">✅ ${m.home_score}–${m.away_score}</span>`
+            : `<span style="font-size:0.78rem;color:var(--gray-mid);">Pendiente</span>`
+          }
+        </td>
+      </tr>`;
+  }).join('');
+
+  mc.innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon" style="font-size:1.5rem;font-weight:900;">${g}</span>
+        <h2>Grupo ${g} — Resultados</h2>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th class="hide-mobile">Fecha</th>
+              <th>Partido</th>
+              <th>Resultado</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>
+    <div id="saveAlert" style="margin-top:1rem;"></div>
+  `;
+}
+
+// ==================== SAVE RESULT ====================
+async function saveResult(matchId) {
+  const hs = document.getElementById(`hs_${matchId}`).value;
+  const as = document.getElementById(`as_${matchId}`).value;
+
+  if (hs === '' || as === '') {
+    showToast('Ingresa ambos marcadores', 'warning');
+    return;
+  }
+
+  try {
+    const r = await apiFetch(`/api/admin/matches/${matchId}/result`, {
+      method: 'PUT',
+      body: JSON.stringify({ home_score: parseInt(hs, 10), away_score: parseInt(as, 10) }),
+    });
+    const d = await r.json();
+    if (!r.ok) { showToast(d.error, 'error'); return; }
+
+    // Update local data
+    const m = allMatches.find(x => x.id === matchId);
+    if (m) { m.home_score = parseInt(hs, 10); m.away_score = parseInt(as, 10); }
+
+    showToast(`✅ Resultado guardado: ${hs}–${as}`, 'success');
+    renderMatches(currentGroup);
+  } catch (err) {
+    showToast('Error al guardar', 'error');
+  }
+}
+
+async function clearResult(matchId) {
+  if (!confirm('¿Eliminar el resultado de este partido?')) return;
+  try {
+    const r = await apiFetch(`/api/admin/matches/${matchId}/result`, { method: 'DELETE' });
+    const d = await r.json();
+    if (!r.ok) { showToast(d.error, 'error'); return; }
+
+    const m = allMatches.find(x => x.id === matchId);
+    if (m) { m.home_score = null; m.away_score = null; }
+
+    showToast('Resultado eliminado', 'info');
+    renderMatches(currentGroup);
+  } catch (err) {
+    showToast('Error al eliminar', 'error');
+  }
+}
+
+// ==================== HELPERS ====================
+function showToast(msg, type = 'info') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+</script>
+</body>
+</html>
