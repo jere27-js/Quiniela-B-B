@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiniela Mundialista 2026 — Productos B&B</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <meta name="theme-color" content="#003087" />
+</head>
+<body>
+<script src="/js/api.js"></script>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="header-brand">
+      <div class="header-logo">B&B</div>
+      <div class="header-title">
+        Quiniela B&amp;B
+        <span>Copa del Mundo 2026</span>
+      </div>
+    </a>
+    <nav class="header-nav" id="headerNav">
+      <button class="btn-nav" onclick="showModal('register')">Registrarse</button>
+      <button class="btn-nav active" onclick="showModal('login')">Iniciar Sesión</button>
+    </nav>
+  </div>
+</header>
+
+<!-- BOTTOM NAV (móvil) -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <a href="/" class="bnav-item active">
+      <span class="bnav-icon">🏠</span>Inicio
+    </a>
+    <a href="/quiniela.html" class="bnav-item">
+      <span class="bnav-icon">⚽</span>Predecir
+    </a>
+    <a href="/leaderboard.html" class="bnav-item">
+      <span class="bnav-icon">🏆</span>Tabla
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">⚽ Copa del Mundo 2026</div>
+  <h1>Quiniela Mundialista<br/>Productos B&amp;B</h1>
+  <p>Predice los resultados, acumula puntos y compite con tus compañeros. ¡El más acertado gana!</p>
+  <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+    <button class="btn btn-secondary btn-lg" onclick="showModal('register')">🚀 Crear cuenta</button>
+    <button class="btn btn-outline btn-lg" style="color:white;border-color:rgba(255,255,255,0.6)" onclick="showModal('login')">Iniciar sesión</button>
+  </div>
+</section>
+
+<!-- CONTENT -->
+<main class="container">
+
+  <!-- CÓMO FUNCIONA -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.25rem;margin-bottom:2rem;">
+    <div class="card">
+      <div class="card-body" style="text-align:center;padding:1.5rem;">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem;">📝</div>
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.4rem;">1. Regístrate</h3>
+        <p style="font-size:0.85rem;color:var(--text-light);">Crea tu cuenta con nombre, correo y contraseña.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body" style="text-align:center;padding:1.5rem;">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem;">⚽</div>
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.4rem;">2. Predice por grupo</h3>
+        <p style="font-size:0.85rem;color:var(--text-light);">Ingresa el marcador que crees para cada partido. Mínimo 24 h antes.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body" style="text-align:center;padding:1.5rem;">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem;">🏆</div>
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.4rem;">3. Acumula puntos</h3>
+        <p style="font-size:0.85rem;color:var(--text-light);"><strong>3 pts</strong> resultado exacto · <strong>1 pt</strong> ganador/empate correcto</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PUNTUACIÓN -->
+  <div class="card" style="margin-bottom:2rem;">
+    <div class="card-header">
+      <span class="card-icon">⭐</span>
+      <h2>Sistema de Puntuación</h2>
+    </div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+        <div style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:var(--light);border-radius:var(--radius-sm);">
+          <span style="font-size:1.8rem;">🎯</span>
+          <div>
+            <div style="font-size:1.3rem;font-weight:900;color:var(--primary);">3 puntos</div>
+            <div style="font-size:0.82rem;color:var(--text-light);">Resultado exacto (ej: 2-1 → 2-1)</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:var(--light);border-radius:var(--radius-sm);">
+          <span style="font-size:1.8rem;">✅</span>
+          <div>
+            <div style="font-size:1.3rem;font-weight:900;color:var(--secondary-dark);">1 punto</div>
+            <div style="font-size:0.82rem;color:var(--text-light);">Ganador/empate correcto sin marcador exacto</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:var(--light);border-radius:var(--radius-sm);">
+          <span style="font-size:1.8rem;">❌</span>
+          <div>
+            <div style="font-size:1.3rem;font-weight:900;color:var(--danger);">0 puntos</div>
+            <div style="font-size:0.82rem;color:var(--text-light);">Pronóstico incorrecto</div>
+          </div>
+        </div>
+      </div>
+      <div class="alert alert-warning" style="margin-top:1rem;">
+        🔒 <strong>Importante:</strong> Las predicciones cierran <strong>24 horas antes</strong> del inicio de cada partido. Después no se puede modificar.
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- MODAL AUTH -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Acceder a la Quiniela</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tabRegister" onclick="switchTab('register')">Registrarse</button>
+        <button class="modal-tab" id="tabLogin" onclick="switchTab('login')">Iniciar Sesión</button>
+      </div>
+      <div id="authAlert"></div>
+
+      <!-- REGISTER FORM -->
+      <form id="registerForm" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label class="form-label">Nombre completo</label>
+          <input type="text" class="form-control" id="regName" placeholder="Tu nombre" required autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Correo electrónico</label>
+          <input type="email" class="form-control" id="regEmail" placeholder="tu@correo.com" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <input type="password" class="form-control" id="regPass" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="regBtn">
+          🚀 Crear cuenta y entrar
+        </button>
+      </form>
+
+      <!-- LOGIN FORM -->
+      <form id="loginForm" style="display:none;" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Correo electrónico</label>
+          <input type="email" class="form-control" id="loginEmail" placeholder="tu@correo.com" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <input type="password" class="form-control" id="loginPass" placeholder="Tu contraseña" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
+          🔐 Iniciar sesión
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== AUTH STATE ====================
+let currentUser = null;
+
+async function checkAuth() {
+  try {
+    const r = await fetch('/api/auth/me');
+    const d = await r.json();
+    if (d.user) {
+      currentUser = d.user;
+      updateHeaderForUser();
+    }
+  } catch (e) {}
+}
+
+function updateHeaderForUser() {
+  const nav = document.getElementById('headerNav');
+  const initials = currentUser.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+  nav.innerHTML = `
+    <a href="/quiniela.html" class="btn-nav">⚽ Predecir</a>
+    <a href="/leaderboard.html" class="btn-nav">🏆 Tabla</a>
+    <div class="user-chip" onclick="handleLogout()">
+      <div class="user-avatar">${initials}</div>
+      ${currentUser.name.split(' ')[0]}
+      <span style="opacity:0.6;font-size:0.7rem;">Salir</span>
+    </div>
+  `;
+}
+
+async function handleLogout() {
+  await apiFetch('/api/auth/logout', { method: 'POST' });
+  window.location.reload();
+}
+
+// ==================== MODAL ====================
+function showModal(tab = 'login') {
+  if (currentUser) { window.location.href = '/quiniela.html'; return; }
+  document.getElementById('authModal').classList.add('open');
+  switchTab(tab);
+}
+
+function closeModal() {
+  document.getElementById('authModal').classList.remove('open');
+}
+
+function switchTab(tab) {
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('loginForm').style.display    = tab === 'login'    ? 'block' : 'none';
+  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+  document.getElementById('tabLogin').classList.toggle('active',    tab === 'login');
+  document.getElementById('authAlert').innerHTML = '';
+}
+
+document.getElementById('authModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ==================== FORMS ====================
+async function handleRegister(e) {
+  e.preventDefault();
+  const btn = document.getElementById('regBtn');
+  const name  = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass  = document.getElementById('regPass').value;
+
+  setAlert('');
+  btn.disabled = true;
+  btn.textContent = 'Creando cuenta…';
+
+  try {
+    const r = await apiFetch('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password: pass }),
+    });
+    const d = await r.json();
+    if (!r.ok) { setAlert(d.error, 'error'); return; }
+    closeModal();
+    showToast('¡Bienvenido/a ' + d.user.name + '! 🎉', 'success');
+    setTimeout(() => { window.location.href = '/quiniela.html'; }, 800);
+  } catch (err) {
+    setAlert('Error de conexión. Intenta de nuevo.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚀 Crear cuenta y entrar';
+  }
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+
+  setAlert('');
+  btn.disabled = true;
+  btn.textContent = 'Entrando…';
+
+  try {
+    const r = await apiFetch('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password: pass }),
+    });
+    const d = await r.json();
+    if (!r.ok) { setAlert(d.error, 'error'); return; }
+    closeModal();
+    showToast('¡Bienvenido/a de nuevo, ' + d.user.name + '! ⚽', 'success');
+    setTimeout(() => { window.location.href = '/quiniela.html'; }, 800);
+  } catch (err) {
+    setAlert('Error de conexión. Intenta de nuevo.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔐 Iniciar sesión';
+  }
+}
+
+// ==================== HELPERS ====================
+function setAlert(msg, type = 'error') {
+  const el = document.getElementById('authAlert');
+  el.innerHTML = msg ? `<div class="alert alert-${type}">${msg}</div>` : '';
+}
+
+function showToast(msg, type = 'info') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+checkAuth();
+</script>
+</body>
+</html>
